@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		B26DE59415B7871900EDFD3F /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B26DE59315B7871900EDFD3F /* CoreFoundation.framework */; };
 		B26DE59A15B7871900EDFD3F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B26DE59815B7871900EDFD3F /* InfoPlist.strings */; };
+		B26DE5A315B78DC500EDFD3F /* cosyTabs.m in Sources */ = {isa = PBXBuildFile; fileRef = B26DE5A215B78DC500EDFD3F /* cosyTabs.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -17,6 +18,8 @@
 		B26DE59715B7871900EDFD3F /* cosyTabs-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "cosyTabs-Info.plist"; sourceTree = "<group>"; };
 		B26DE59915B7871900EDFD3F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B26DE59B15B7871900EDFD3F /* cosyTabs-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "cosyTabs-Prefix.pch"; sourceTree = "<group>"; };
+		B26DE5A115B78DC500EDFD3F /* cosyTabs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cosyTabs.h; sourceTree = "<group>"; };
+		B26DE5A215B78DC500EDFD3F /* cosyTabs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = cosyTabs.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +63,8 @@
 			isa = PBXGroup;
 			children = (
 				B26DE59615B7871900EDFD3F /* Supporting Files */,
+				B26DE5A115B78DC500EDFD3F /* cosyTabs.h */,
+				B26DE5A215B78DC500EDFD3F /* cosyTabs.m */,
 			);
 			path = cosyTabs;
 			sourceTree = "<group>";
@@ -136,6 +141,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B26DE5A315B78DC500EDFD3F /* cosyTabs.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
