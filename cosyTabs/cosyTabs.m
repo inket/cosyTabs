@@ -54,12 +54,27 @@ static cosyTabs* plugin = nil;
 	Class class = NSClassFromString(@"TabBarView");
     
     Method new = class_getInstanceMethod(class, @selector(new_availableWidthForButtonsWhenUnclipped));
-	Method old = class_getInstanceMethod(class, @selector(_availableWidthForButtonsWhenUnclipped));
-	method_exchangeImplementations(new, old);
+    Method old = class_getInstanceMethod(class, @selector(_availableWidthForButtonsWhenUnclipped));
+    method_exchangeImplementations(new, old);
     
     new = class_getInstanceMethod(class, @selector(new_tabViewDidChangeNumberOfTabViewItems:));
     old = class_getInstanceMethod(class, @selector(tabViewDidChangeNumberOfTabViewItems:));
     method_exchangeImplementations(new, old);
+    
+    // Resize already-open tabs, surrounded by a try-catch as a precaution. Thanks to @gbroochian for the suggestion.
+    @try {
+        for (NSWindow* window in [[NSClassFromString(@"NSApplication") sharedApplication] windows])
+        {
+            if ([window isKindOfClass:NSClassFromString(@"BrowserWindow")])
+            {
+                NSArray *orderedTabViewItems = [window performSelector:@selector(orderedTabViewItems)];
+                [[[orderedTabViewItems firstObject] performSelector:@selector(tabBarView)] performSelector:@selector(refreshButtons)];
+            }
+        }
+    }
+    @catch (NSException* exception) {
+        NSLog(@"Caught cosyTabs exception: %@", exception);
+    }
 }
 
 @end
