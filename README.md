@@ -13,7 +13,7 @@ Tested on Safari 6 and 7.
 ### How to Install
 
 1. Download and install [EasySIMBL](https://github.com/norio-nomura/EasySIMBL/#how-to-install) (recommended) or [SIMBL](http://www.culater.net/software/SIMBL/SIMBL.php)
-2. Download cosyTabs here: [cosyTabs-1.1.zip](https://github.com/inket/cosyTabs/releases/download/v1.0/cosyTabs-1.0.zip) (older versions [here](https://github.com/inket/cosyTabs/releases))
+2. Download cosyTabs here: [cosyTabs-1.1.zip](https://github.com/inket/cosyTabs/releases/download/v1.1/cosyTabs-1.1.zip) (older versions [here](https://github.com/inket/cosyTabs/releases))
 3. Install cosyTabs:
 	- **EasySIMBL**: Open EasySIMBL and drag & drop *cosyTabs.bundle* into the list.
 	- **SIMBL**: Copy *cosyTabs.bundle* to `/Library/Application Support/SIMBL/Plugins/`.
