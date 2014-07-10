@@ -18,7 +18,21 @@ static cosyTabs* plugin = nil;
 
 @implementation NSObject (cosyTabs)
 
-#pragma mark Controlling tab width
+#pragma mark - Controlling tab width
+
+#pragma mark Safari 8+
+
+- (CGFloat)new_buttonWidthForNumberOfButtons:(NSInteger)n inWidth:(CGFloat)w remainderWidth:(CGFloat)rw {
+    NSInteger x = [self new_buttonWidthForNumberOfButtons:n inWidth:w remainderWidth:rw];
+    if (x > MAX_TAB_WIDTH) return MAX_TAB_WIDTH;
+    return x;
+}
+
+- (BOOL)new_shouldLayOutButtonsToAlignWithWindowCenter {
+    return NO;
+}
+
+#pragma mark Safari 7 <=
 
 - (double)new_availableWidthForButtonsWhenUnclipped {
     unsigned long long numberOfTabs = (unsigned long long)[self performSelector:@selector(numberOfTabs)];
@@ -38,7 +52,7 @@ static cosyTabs* plugin = nil;
     [self performSelector:@selector(refreshButtons)];
 }
 
-#pragma mark Controlling tab title margins
+#pragma mark - Controlling tab title margins
 
 - (void)new__updateTitleTextFieldFrame {
     [self new__updateTitleTextFieldFrame];
@@ -106,30 +120,50 @@ static cosyTabs* plugin = nil;
 }
 
 - (void)loadPlugin {
-	Class class = NSClassFromString(@"TabBarView");
+    BOOL safari8OrLater = NSClassFromString(@"ScrollableTabBarView") != nil;
+    NSLog(@"TabBarView:%@", NSClassFromString(@"TabBarView"));
     
-    Method new = class_getInstanceMethod(class, @selector(new_availableWidthForButtonsWhenUnclipped));
-    Method old = class_getInstanceMethod(class, @selector(_availableWidthForButtonsWhenUnclipped));
-    method_exchangeImplementations(new, old);
-    
-    new = class_getInstanceMethod(class, @selector(new_tabViewDidChangeNumberOfTabViewItems:));
-    old = class_getInstanceMethod(class, @selector(tabViewDidChangeNumberOfTabViewItems:));
-    method_exchangeImplementations(new, old);
-    
-    if (TAB_TITLE_LEFT_MARGIN != NSIntegerMax || TAB_TITLE_RIGHT_MARGIN != NSIntegerMax)
+    if (safari8OrLater)
     {
-        class = NSClassFromString(@"AttachedTabButton");
-        new = class_getInstanceMethod(class, @selector(new__updateTitleTextFieldFrame));
-        old = class_getInstanceMethod(class, @selector(_updateTitleTextFieldFrame));
+        Class class = NSClassFromString(@"ScrollableTabBarView");
+        
+        Method new = class_getInstanceMethod(class, @selector(new_buttonWidthForNumberOfButtons:inWidth:remainderWidth:));
+        Method old = class_getInstanceMethod(class, @selector(_buttonWidthForNumberOfButtons:inWidth:remainderWidth:));
         method_exchangeImplementations(new, old);
         
-        new = class_getInstanceMethod(class, @selector(new_setState:));
-        old = class_getInstanceMethod(class, @selector(setState:));
+        new = class_getInstanceMethod(class, @selector(new_shouldLayOutButtonsToAlignWithWindowCenter));
+        old = class_getInstanceMethod(class, @selector(_shouldLayOutButtonsToAlignWithWindowCenter));
+        method_exchangeImplementations(new, old);
+    }
+    else
+    {
+        Class class = NSClassFromString(@"TabBarView");
+        
+        Method new = class_getInstanceMethod(class, @selector(new_availableWidthForButtonsWhenUnclipped));
+        Method old = class_getInstanceMethod(class, @selector(_availableWidthForButtonsWhenUnclipped));
         method_exchangeImplementations(new, old);
         
-        new = class_getInstanceMethod(class, @selector(new_setTitle:));
-        old = class_getInstanceMethod(class, @selector(setTitle:));
+        new = class_getInstanceMethod(class, @selector(new_tabViewDidChangeNumberOfTabViewItems:));
+        old = class_getInstanceMethod(class, @selector(tabViewDidChangeNumberOfTabViewItems:));
         method_exchangeImplementations(new, old);
+        
+        
+        if (TAB_TITLE_LEFT_MARGIN != NSIntegerMax || TAB_TITLE_RIGHT_MARGIN != NSIntegerMax)
+        {
+            class = NSClassFromString(@"AttachedTabButton");
+            
+            new = class_getInstanceMethod(class, @selector(new__updateTitleTextFieldFrame));
+            old = class_getInstanceMethod(class, @selector(_updateTitleTextFieldFrame));
+            method_exchangeImplementations(new, old);
+            
+            new = class_getInstanceMethod(class, @selector(new_setState:));
+            old = class_getInstanceMethod(class, @selector(setState:));
+            method_exchangeImplementations(new, old);
+            
+            new = class_getInstanceMethod(class, @selector(new_setTitle:));
+            old = class_getInstanceMethod(class, @selector(setTitle:));
+            method_exchangeImplementations(new, old);
+        }
     }
     
     // Resize already-open tabs, surrounded by a try-catch as a precaution. Thanks to @gbroochian for the suggestion.
@@ -139,7 +173,20 @@ static cosyTabs* plugin = nil;
             if ([window isKindOfClass:NSClassFromString(@"BrowserWindow")])
             {
                 NSArray *orderedTabViewItems = [window performSelector:@selector(orderedTabViewItems)];
-                [[[orderedTabViewItems firstObject] performSelector:@selector(tabBarView)] performSelector:@selector(refreshButtons)];
+                id firstTabBarViewItem = [orderedTabViewItems firstObject];
+                
+                // Safari 8
+                if ([firstTabBarViewItem respondsToSelector:@selector(scrollableTabBarView)])
+                {
+                    id scrollableTabBarView = [firstTabBarViewItem performSelector:@selector(scrollableTabBarView)];
+                    [scrollableTabBarView performSelector:@selector(tabViewDidChangeNumberOfTabViewItems:) withObject:nil];
+                }
+                // Safari 7<=
+                else if ([firstTabBarViewItem respondsToSelector:@selector(tabBarView)])
+                {
+                    id tabBarView = [firstTabBarViewItem performSelector:@selector(tabBarView)];
+                    [tabBarView performSelector:@selector(refreshButtons)];
+                }
             }
         }
     }
