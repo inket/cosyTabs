@@ -22,6 +22,66 @@ static cosyTabs* plugin = nil;
 
 #pragma mark Safari 8+
 
+- (void)new_trackMouseEventsForEvent:(NSEvent*)datEvent onTabAtIndex:(NSInteger)tabIndex {
+    // Capture click events in the tab bar
+    
+    if ([datEvent clickCount] == 2)
+    {
+        if (tabIndex == 0)
+        {
+            NSView* v = (NSView*)self;
+            
+            for (NSView* view in [v subviews]) {
+                if ([view isKindOfClass:[NSClassFromString(@"ScrollableTabBarViewButton") class]])
+                {
+                    NSView* previousView = [[v subviews] objectAtIndex:[[v subviews] indexOfObject:view]-1];
+                    NSPoint windowLocation = [datEvent locationInWindow];
+                    NSPoint viewLocation = [previousView convertPoint:windowLocation fromView:nil];
+                    if (NSPointInRect(viewLocation, [previousView bounds]))
+                    {
+                        NSButton* newTabButton = (NSButton*)view;
+                        [[NSClassFromString(@"NSApplication") sharedApplication] sendAction:newTabButton.action to:newTabButton.target from:newTabButton];
+                        return;
+                    }
+                    
+                    break;
+                }
+            }
+        }
+        else
+        {
+            @try {
+                [self new_trackMouseEventsForEvent:datEvent onTabAtIndex:tabIndex];
+            }
+            @catch (NSException *exception) {
+                if ([[exception name] isEqualToString:NSRangeException])
+                {
+                    NSView* v = (NSView*)self;
+                    
+                    for (NSView* view in [v subviews]) {
+                        if ([view isKindOfClass:[NSClassFromString(@"ScrollableTabBarViewButton") class]])
+                        {
+                            NSButton* newTabButton = (NSButton*)view;
+                            [[NSClassFromString(@"NSApplication") sharedApplication] sendAction:newTabButton.action to:newTabButton.target from:newTabButton];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    @try {
+        [self new_trackMouseEventsForEvent:datEvent onTabAtIndex:tabIndex];
+    }
+    @catch (NSException *exception) {
+        if (![[exception name] isEqualToString:NSRangeException])
+        {
+            @throw exception;
+        }
+    }
+}
+
 - (CGFloat)new_buttonWidthForNumberOfButtons:(NSInteger)n inWidth:(CGFloat)w remainderWidth:(CGFloat)rw {
     NSInteger x = [self new_buttonWidthForNumberOfButtons:n inWidth:w remainderWidth:rw];
     if (x > MAX_TAB_WIDTH) return MAX_TAB_WIDTH;
@@ -133,6 +193,10 @@ static cosyTabs* plugin = nil;
         
         new = class_getInstanceMethod(class, @selector(new_shouldLayOutButtonsToAlignWithWindowCenter));
         old = class_getInstanceMethod(class, @selector(_shouldLayOutButtonsToAlignWithWindowCenter));
+        method_exchangeImplementations(new, old);
+        
+        new = class_getInstanceMethod(class, @selector(new_trackMouseEventsForEvent:onTabAtIndex:));
+        old = class_getInstanceMethod(class, @selector(_trackMouseEventsForEvent:onTabAtIndex:));
         method_exchangeImplementations(new, old);
     }
     else
