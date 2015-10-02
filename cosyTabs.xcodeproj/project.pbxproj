@@ -106,7 +106,7 @@
 		B26DE58715B7871900EDFD3F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = inket;
 			};
 			buildConfigurationList = B26DE58A15B7871900EDFD3F /* Build configuration list for PBXProject "cosyTabs" */;
@@ -184,6 +184,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -231,6 +232,7 @@
 				GCC_PREFIX_HEADER = "cosyTabs/cosyTabs-Prefix.pch";
 				INFOPLIST_FILE = "cosyTabs/cosyTabs-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				PRODUCT_BUNDLE_IDENTIFIER = "me.inket.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = bundle;
 			};
@@ -244,6 +246,7 @@
 				GCC_PREFIX_HEADER = "cosyTabs/cosyTabs-Prefix.pch";
 				INFOPLIST_FILE = "cosyTabs/cosyTabs-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				PRODUCT_BUNDLE_IDENTIFIER = "me.inket.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = bundle;
 			};
