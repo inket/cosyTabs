@@ -20,6 +20,32 @@ static cosyTabs* plugin = nil;
 
 #pragma mark - Controlling tab width
 
+#pragma mark Safari 9+
+
+- (void)new_moveButton:(id)button toIndex:(NSUInteger)index {
+    NSUInteger numberOfTabs = (NSUInteger)[self performSelector:@selector(_numberOfTabsForLayout)];
+    if (index >= numberOfTabs-1)
+    {
+        [self new_moveButton:button toIndex:numberOfTabs-1];
+    }
+    else
+    {
+        [self new_moveButton:button toIndex:index];
+    }
+}
+
+- (NSView*)new_hitTest:(NSPoint)point {    
+    NSUInteger numberOfTabs = (NSUInteger)[self performSelector:@selector(_numberOfTabsForLayout)];
+    if (point.x > numberOfTabs*MAX_TAB_WIDTH)
+    {
+        return nil;
+    }
+    else
+    {
+        return [self new_hitTest:point];
+    }
+}
+
 #pragma mark Safari 8+
 
 - (void)new_trackMouseEventsForEvent:(NSEvent*)datEvent onTabAtIndex:(NSInteger)tabIndex {
@@ -142,8 +168,8 @@ static cosyTabs* plugin = nil;
     
     // Move the Close button to the top of the hierarchy so it can be clicked
     NSButton* closeButton = [self valueForKey:@"closeButton"];
-    NSButton* tabCell = [(NSButton*)self cell];
-    [(NSButton*)self addSubview:closeButton positioned:NSWindowAbove relativeTo:tabCell];
+    NSButtonCell* tabCell = [(NSButton*)self cell];
+    [(NSButton*)self addSubview:closeButton positioned:NSWindowAbove relativeTo:(NSView*)tabCell];
 }
 
 - (void)new_setState:(id)arg1 {
@@ -180,12 +206,12 @@ static cosyTabs* plugin = nil;
 }
 
 - (void)loadPlugin {
-    BOOL safari8OrLater = NSClassFromString(@"ScrollableTabBarView") != nil;
-    NSLog(@"TabBarView:%@", NSClassFromString(@"TabBarView"));
+    BOOL safari9 = [cosyTabs isSafari9];
+    BOOL safari8 = [cosyTabs isSafari8];
     
-    if (safari8OrLater)
+    if (safari8 || safari9)
     {
-        Class class = NSClassFromString(@"ScrollableTabBarView");
+        Class class = NSClassFromString(safari9 ? @"TabBarView" : @"ScrollableTabBarView");
         
         Method new = class_getInstanceMethod(class, @selector(new_buttonWidthForNumberOfButtons:inWidth:remainderWidth:));
         Method old = class_getInstanceMethod(class, @selector(_buttonWidthForNumberOfButtons:inWidth:remainderWidth:));
@@ -195,11 +221,28 @@ static cosyTabs* plugin = nil;
         old = class_getInstanceMethod(class, @selector(_shouldLayOutButtonsToAlignWithWindowCenter));
         method_exchangeImplementations(new, old);
         
-        new = class_getInstanceMethod(class, @selector(new_trackMouseEventsForEvent:onTabAtIndex:));
-        old = class_getInstanceMethod(class, @selector(_trackMouseEventsForEvent:onTabAtIndex:));
-        method_exchangeImplementations(new, old);
+        if (safari9)
+        {
+            new = class_getInstanceMethod(class, @selector(new_hitTest:));
+            old = class_getInstanceMethod(class, @selector(hitTest:));
+            method_exchangeImplementations(new, old);
+            
+            new = class_getInstanceMethod(class, @selector(new_moveButton:toIndex:));
+            old = class_getInstanceMethod(class, @selector(_moveButton:toIndex:));
+            method_exchangeImplementations(new, old);
+
+            new = class_getInstanceMethod(class, @selector(new_mouseUp:));
+            old = class_getInstanceMethod(class, @selector(mouseUp:));
+            method_exchangeImplementations(new, old);
+        }
+        else
+        {
+            new = class_getInstanceMethod(class, @selector(new_trackMouseEventsForEvent:onTabAtIndex:));
+            old = class_getInstanceMethod(class, @selector(_trackMouseEventsForEvent:onTabAtIndex:));
+            method_exchangeImplementations(new, old);
+        }
     }
-    else
+    else // Safari 7
     {
         Class class = NSClassFromString(@"TabBarView");
         
@@ -257,6 +300,21 @@ static cosyTabs* plugin = nil;
     @catch (NSException* exception) {
         NSLog(@"Caught cosyTabs exception: %@", exception);
     }
+}
+
++ (BOOL)isSafari9 {
+    NSBundle* bundle = NSBundle.mainBundle;
+    if ([bundle respondsToSelector:@selector(shortVersion)])
+    {
+        NSString* version = [bundle performSelector:@selector(shortVersion)];
+        return [version hasPrefix:@"9."];
+    }
+    
+    return NO;
+}
+
++ (BOOL)isSafari8 {
+    return NSClassFromString(@"ScrollableTabBarView") != nil;
 }
 
 @end
