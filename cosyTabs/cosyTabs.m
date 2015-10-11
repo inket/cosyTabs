@@ -22,28 +22,10 @@ static cosyTabs* plugin = nil;
 
 #pragma mark Safari 9+
 
-- (void)new_moveButton:(id)button toIndex:(NSUInteger)index {
-    NSUInteger numberOfTabs = (NSUInteger)[self performSelector:@selector(_numberOfTabsForLayout)];
-    if (index >= numberOfTabs-1)
-    {
-        [self new_moveButton:button toIndex:numberOfTabs-1];
-    }
-    else
-    {
-        [self new_moveButton:button toIndex:index];
-    }
-}
-
-- (NSView*)new_hitTest:(NSPoint)point {    
-    NSUInteger numberOfTabs = (NSUInteger)[self performSelector:@selector(_numberOfTabsForLayout)];
-    if (point.x > numberOfTabs*MAX_TAB_WIDTH)
-    {
-        return nil;
-    }
-    else
-    {
-        return [self new_hitTest:point];
-    }
+- (void)new_setButtonWidthForTitleLayout:(double)arg1 animated:(BOOL)arg2 {
+    if (arg1 > MAX_TAB_WIDTH) arg1 = MAX_TAB_WIDTH;
+    
+    [self new_setButtonWidthForTitleLayout:arg1 animated:arg2];
 }
 
 #pragma mark Safari 8+
@@ -223,16 +205,9 @@ static cosyTabs* plugin = nil;
         
         if (safari9)
         {
-            new = class_getInstanceMethod(class, @selector(new_hitTest:));
-            old = class_getInstanceMethod(class, @selector(hitTest:));
-            method_exchangeImplementations(new, old);
-            
-            new = class_getInstanceMethod(class, @selector(new_moveButton:toIndex:));
-            old = class_getInstanceMethod(class, @selector(_moveButton:toIndex:));
-            method_exchangeImplementations(new, old);
-
-            new = class_getInstanceMethod(class, @selector(new_mouseUp:));
-            old = class_getInstanceMethod(class, @selector(mouseUp:));
+            class = NSClassFromString(@"TabButton");
+            new = class_getInstanceMethod(class, @selector(new_setButtonWidthForTitleLayout:animated:));
+            old = class_getInstanceMethod(class, @selector(setButtonWidthForTitleLayout:animated:));
             method_exchangeImplementations(new, old);
         }
         else
