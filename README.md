@@ -16,6 +16,8 @@ It has been confirmed that the old SIMBL-0.9.9 works, but only after disabling S
 
 Here's the guide for installing SIMBL on El Capitan: https://github.com/norio-nomura/EasySIMBL/issues/26#issuecomment-117028426
 
+After that, [download cosyTabs](https://github.com/inket/cosyTabs/releases), extract it, and place `cosyTabs.bundle` in `/Library/Application Support/SIMBL/Plugins/`
+
 ##### For advanced users
 
 Obviously, there is no need to disable SIP (and reboot 4+ times). If you can extract SIMBL from the .pkg, boot into Recovery or any other OS, then you can simply copy the SIMBL's files to the correct paths.
