@@ -4,9 +4,7 @@ Tested on Safari 6, 7, 8, 9.
 
 ### Preview
 
-![Before](http://i.imgur.com/wWDIvmW.png)
-
-![After](http://i.imgur.com/uvlTtyt.png)
+![After](http://i.imgur.com/sTX1W7j.png)
 
 ## How to Install
 
