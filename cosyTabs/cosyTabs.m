@@ -254,21 +254,30 @@ static cosyTabs* plugin = nil;
         {
             if ([window isKindOfClass:NSClassFromString(@"BrowserWindow")])
             {
-                NSArray *orderedTabViewItems = [window performSelector:@selector(orderedTabViewItems)];
-                id firstTabBarViewItem = [orderedTabViewItems firstObject];
-                
-                // Safari 8
-                if ([firstTabBarViewItem respondsToSelector:@selector(scrollableTabBarView)])
+                if (safari9)
                 {
-                    id scrollableTabBarView = [firstTabBarViewItem performSelector:@selector(scrollableTabBarView)];
-                    [scrollableTabBarView performSelector:@selector(tabViewDidChangeNumberOfTabViewItems:) withObject:nil];
+                    id tabBarView = [[window windowController] performSelector:@selector(tabBarView)];
+                    [tabBarView performSelector:@selector(layout)];
                 }
-                // Safari 7<=
-                else if ([firstTabBarViewItem respondsToSelector:@selector(tabBarView)])
+                else
                 {
-                    id tabBarView = [firstTabBarViewItem performSelector:@selector(tabBarView)];
-                    [tabBarView performSelector:@selector(refreshButtons)];
+                    NSArray *orderedTabViewItems = [window performSelector:@selector(orderedTabViewItems)];
+                    id firstTabBarViewItem = [orderedTabViewItems firstObject];
+                    
+                    // Safari 8
+                    if ([firstTabBarViewItem respondsToSelector:@selector(scrollableTabBarView)])
+                    {
+                        id scrollableTabBarView = [firstTabBarViewItem performSelector:@selector(scrollableTabBarView)];
+                        [scrollableTabBarView performSelector:@selector(tabViewDidChangeNumberOfTabViewItems:) withObject:nil];
+                    }
+                    // Safari 7<=
+                    else if ([firstTabBarViewItem respondsToSelector:@selector(tabBarView)])
+                    {
+                        id tabBarView = [firstTabBarViewItem performSelector:@selector(tabBarView)];
+                        [tabBarView performSelector:@selector(refreshButtons)];
+                    }
                 }
+
             }
         }
     }
