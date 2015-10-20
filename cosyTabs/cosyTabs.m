@@ -22,6 +22,27 @@ static cosyTabs* plugin = nil;
 
 #pragma mark Safari 9+
 
+- (unsigned long long)new_visibleTabIndexAtPoint:(struct CGPoint)point
+                                  stackingRegion:(unsigned long long *)arg2
+               ignorePointsOutsideOfLayoutBounds:(BOOL)arg3 {
+    unsigned long long originalResult = [self new_visibleTabIndexAtPoint:point
+                                                          stackingRegion:arg2
+                                       ignorePointsOutsideOfLayoutBounds:arg3];
+    
+    if (originalResult == 0)
+    {
+        BOOL pinnedTabsNonExistent = (NSInteger)[self performSelector:@selector(_numberOfPinnedTabsForLayout)] == 0;
+        BOOL singleTab = (NSInteger)[self performSelector:@selector(_numberOfTabsForLayout)] == 1;
+        
+        if (pinnedTabsNonExistent && singleTab && point.x > MAX_TAB_WIDTH)
+        {
+            return LONG_LONG_MAX; // ULONG_LONG_MAX -> Crash!
+        }
+    }
+
+    return originalResult;
+}
+
 - (void)new_setButtonWidthForTitleLayout:(double)arg1 animated:(BOOL)arg2 {
     if (arg1 > MAX_TAB_WIDTH) arg1 = MAX_TAB_WIDTH;
     
@@ -205,6 +226,10 @@ static cosyTabs* plugin = nil;
         
         if (safari9)
         {
+            new = class_getInstanceMethod(class, @selector(new_visibleTabIndexAtPoint:stackingRegion:ignorePointsOutsideOfLayoutBounds:));
+            old = class_getInstanceMethod(class, @selector(_visibleTabIndexAtPoint:stackingRegion:ignorePointsOutsideOfLayoutBounds:));
+            method_exchangeImplementations(new, old);
+            
             class = NSClassFromString(@"TabButton");
             new = class_getInstanceMethod(class, @selector(new_setButtonWidthForTitleLayout:animated:));
             old = class_getInstanceMethod(class, @selector(setButtonWidthForTitleLayout:animated:));
