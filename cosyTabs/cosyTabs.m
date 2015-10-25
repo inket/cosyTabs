@@ -43,6 +43,24 @@ static cosyTabs* plugin = nil;
     return originalResult;
 }
 
+- (unsigned long long)yosemite_visibleTabIndexAtPoint:(struct CGPoint)point
+                                       stackingRegion:(unsigned long long *)arg2
+                    ignorePointsOutsideOfLayoutBounds:(BOOL)arg3 {
+    unsigned long long originalResult = [self yosemite_visibleTabIndexAtPoint:point
+                                                               stackingRegion:arg2
+                                            ignorePointsOutsideOfLayoutBounds:arg3];
+    
+    BOOL numberOfTabs = (NSInteger)[self performSelector:@selector(_numberOfTabsForLayout)];
+    BOOL clickOnTabBarBackground = point.x > MAX_TAB_WIDTH * numberOfTabs;
+    
+    if ((originalResult == 0 || originalResult > numberOfTabs - 1) && clickOnTabBarBackground)
+    {
+        return LONG_LONG_MAX; // ULONG_LONG_MAX -> Crash!
+    }
+    
+    return originalResult;
+}
+
 - (void)new_setButtonWidthForTitleLayout:(double)arg1 animated:(BOOL)arg2 {
     if (arg1 > MAX_TAB_WIDTH) arg1 = MAX_TAB_WIDTH;
     
@@ -230,6 +248,12 @@ static cosyTabs* plugin = nil;
             if (elCapitanOrLater)
             {
                 new = class_getInstanceMethod(class, @selector(new_visibleTabIndexAtPoint:stackingRegion:ignorePointsOutsideOfLayoutBounds:));
+                old = class_getInstanceMethod(class, @selector(_visibleTabIndexAtPoint:stackingRegion:ignorePointsOutsideOfLayoutBounds:));
+                method_exchangeImplementations(new, old);
+            }
+            else
+            {
+                new = class_getInstanceMethod(class, @selector(yosemite_visibleTabIndexAtPoint:stackingRegion:ignorePointsOutsideOfLayoutBounds:));
                 old = class_getInstanceMethod(class, @selector(_visibleTabIndexAtPoint:stackingRegion:ignorePointsOutsideOfLayoutBounds:));
                 method_exchangeImplementations(new, old);
             }
