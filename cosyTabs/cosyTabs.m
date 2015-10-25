@@ -209,6 +209,7 @@ static cosyTabs* plugin = nil;
 }
 
 - (void)loadPlugin {
+    BOOL elCapitanOrLater = [cosyTabs isElCapitanOrLater];
     BOOL safari9 = [cosyTabs isSafari9];
     BOOL safari8 = [cosyTabs isSafari8];
     
@@ -226,9 +227,12 @@ static cosyTabs* plugin = nil;
         
         if (safari9)
         {
-            new = class_getInstanceMethod(class, @selector(new_visibleTabIndexAtPoint:stackingRegion:ignorePointsOutsideOfLayoutBounds:));
-            old = class_getInstanceMethod(class, @selector(_visibleTabIndexAtPoint:stackingRegion:ignorePointsOutsideOfLayoutBounds:));
-            method_exchangeImplementations(new, old);
+            if (elCapitanOrLater)
+            {
+                new = class_getInstanceMethod(class, @selector(new_visibleTabIndexAtPoint:stackingRegion:ignorePointsOutsideOfLayoutBounds:));
+                old = class_getInstanceMethod(class, @selector(_visibleTabIndexAtPoint:stackingRegion:ignorePointsOutsideOfLayoutBounds:));
+                method_exchangeImplementations(new, old);
+            }
             
             class = NSClassFromString(@"TabButton");
             new = class_getInstanceMethod(class, @selector(new_setButtonWidthForTitleLayout:animated:));
@@ -324,6 +328,25 @@ static cosyTabs* plugin = nil;
 
 + (BOOL)isSafari8 {
     return NSClassFromString(@"ScrollableTabBarView") != nil;
+}
+
++ (NSString*)osVersion {
+    static NSString* versionString = nil;
+    if (!versionString)
+    {
+        NSDictionary * sv = [NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];
+        versionString = [sv objectForKey:@"ProductVersion"];
+    }
+    
+    return versionString;
+}
+
++ (BOOL)isYosemite {
+    return [[cosyTabs osVersion] hasPrefix:@"10.10"];
+}
+
++ (BOOL)isElCapitanOrLater {
+    return ![cosyTabs isYosemite] && [[cosyTabs osVersion] hasPrefix:@"10.1"];
 }
 
 @end
