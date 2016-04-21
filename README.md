@@ -39,5 +39,17 @@ Obviously, there is no need to disable SIP (and reboot 4+ times). If you can ext
 3. Extract & Install cosyTabs:
 	- Open EasySIMBL and drag & drop *cosyTabs.bundle* into the list.
 
+### Note about Safari Technology Preview
+
+I could not get SIMBL to inject into Safari Technology Preview (STP), so STP is unsupported at the moment.
+
+Please create an issue if you have a clue on how to fix this error:
+
+```
+Safari Technology Preview[3466:43691] Error loading /System/Library/ScriptingAdditions/SIMBL.osax/Contents/MacOS/SIMBL:  dlopen(/System/Library/ScriptingAdditions/SIMBL.osax/Contents/MacOS/SIMBL, 262): no suitable image found.  Did find:
+	/System/Library/ScriptingAdditions/SIMBL.osax/Contents/MacOS/SIMBL: mmap() error 1 at address=0x10AF27000, size=0x00004000 segment=__TEXT in Segment::map() mapping /System/Library/ScriptingAdditions/SIMBL.osax/Contents/MacOS/SIMBL
+Safari Technology Preview: OpenScripting.framework - can't find entry point InjectEventHandler in scripting addition /System/Library/ScriptingAdditions/SIMBL.osax.
+```
+
 ### License
 This program is licensed under GNU GPL v3.0 (see LICENSE)
