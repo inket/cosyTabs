@@ -1,16 +1,26 @@
 Safari 5 tabs on Safari 6+. Cosy.
 
-Tested on Safari 6, 7, 8, 9.
+Tested on Safari 6, 7, 8, 9, 10.
 
-Safari 9 was tested under El Capitan and Yosemite.
+Safari 10 was tested under macOS Sierra only.
 
-If you're using an old version of Safari/OS X and you're having problems with the latest version, try the older ones.
+If you're using an old version of Safari/macOS and you're having problems with the latest version, try the older ones.
 
 ### Preview
 
 ![After](http://i.imgur.com/sTX1W7j.png)
 
 ## How to Install
+
+### macOS Sierra (10.12)
+
+Disable System Integrity Protection, and install the latest version of [mySIMBL](https://github.com/w0lfschild/app_updates/tree/master/mySIMBL).
+
+After that, [download cosyTabs](https://github.com/inket/cosyTabs/releases), extract it, and place `cosyTabs.bundle` in `/Library/Application Support/SIMBL/Plugins/`
+
+Run Safari!
+
+(Feel free to turn SIP back on after this installation, SIMBL will continue to work.)
 
 ### El Capitan (OS X 10.11)
 
