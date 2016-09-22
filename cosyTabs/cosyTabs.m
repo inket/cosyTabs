@@ -228,7 +228,7 @@ static cosyTabs* plugin = nil;
 
 - (void)loadPlugin {
     BOOL elCapitanOrLater = [cosyTabs isElCapitanOrLater];
-    BOOL safari9 = [cosyTabs isSafari9];
+    BOOL safari9 = [cosyTabs isSafari9OrLater];
     BOOL safari8 = [cosyTabs isSafari8];
     
     if (safari8 || safari9)
@@ -339,19 +339,23 @@ static cosyTabs* plugin = nil;
     }
 }
 
-+ (BOOL)isSafari9 {
-    NSBundle* bundle = NSBundle.mainBundle;
-    if ([bundle respondsToSelector:@selector(shortVersion)])
-    {
-        NSString* version = [bundle performSelector:@selector(shortVersion)];
-        return [version hasPrefix:@"9."];
-    }
-    
-    return NO;
++ (BOOL)isSafari9OrLater {
+    return [self safariMajorVersion] >= 9;
 }
 
 + (BOOL)isSafari8 {
     return NSClassFromString(@"ScrollableTabBarView") != nil;
+}
+
++ (NSInteger)safariMajorVersion {
+    NSBundle* bundle = NSBundle.mainBundle;
+    if ([bundle respondsToSelector:@selector(shortVersion)])
+    {
+        NSString* version = [bundle performSelector:@selector(shortVersion)];
+        return [version componentsSeparatedByString:@"."].firstObject.integerValue;
+    }
+
+    return 0;
 }
 
 + (NSString*)osVersion {
