@@ -228,13 +228,14 @@ static cosyTabs* plugin = nil;
 
 - (void)loadPlugin {
     BOOL elCapitanOrLater = [cosyTabs isElCapitanOrLater];
-    BOOL safari9 = [cosyTabs isSafari9OrLater];
+    BOOL safari10OrLater = [cosyTabs isSafari10OrLater];
+    BOOL safari9OrLater = [cosyTabs isSafari9OrLater];
     BOOL safari8 = [cosyTabs isSafari8];
     
-    if (safari8 || safari9)
+    if (safari8 || safari9OrLater)
     {
-        Class class = NSClassFromString(safari9 ? @"TabBarView" : @"ScrollableTabBarView");
-        
+        Class class = NSClassFromString(safari9OrLater ? @"TabBarView" : @"ScrollableTabBarView");
+
         Method new = class_getInstanceMethod(class, @selector(new_buttonWidthForNumberOfButtons:inWidth:remainderWidth:));
         Method old = class_getInstanceMethod(class, @selector(_buttonWidthForNumberOfButtons:inWidth:remainderWidth:));
         method_exchangeImplementations(new, old);
@@ -242,8 +243,8 @@ static cosyTabs* plugin = nil;
         new = class_getInstanceMethod(class, @selector(new_shouldLayOutButtonsToAlignWithWindowCenter));
         old = class_getInstanceMethod(class, @selector(_shouldLayOutButtonsToAlignWithWindowCenter));
         method_exchangeImplementations(new, old);
-        
-        if (safari9)
+
+        if (safari9OrLater)
         {
             if (elCapitanOrLater)
             {
@@ -307,7 +308,7 @@ static cosyTabs* plugin = nil;
         {
             if ([window isKindOfClass:NSClassFromString(@"BrowserWindow")])
             {
-                if (safari9)
+                if (safari9OrLater)
                 {
                     id tabBarView = [[window windowController] performSelector:@selector(tabBarView)];
                     [tabBarView performSelector:@selector(layout)];
@@ -337,6 +338,10 @@ static cosyTabs* plugin = nil;
     @catch (NSException* exception) {
         NSLog(@"Caught cosyTabs exception: %@", exception);
     }
+}
+
++ (BOOL)isSafari10OrLater {
+    return [self safariMajorVersion] >= 10;
 }
 
 + (BOOL)isSafari9OrLater {
