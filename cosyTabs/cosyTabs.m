@@ -161,6 +161,14 @@ static cosyTabs* plugin = nil;
 
 #pragma mark - Controlling tab title margins
 
+#pragma mark Safari 10+
+
+- (void)new_setTitleTextFieldCenterOffset:(double)arg1 animated:(BOOL)arg2 {
+    [self new_setTitleTextFieldCenterOffset:0 animated:arg2];
+}
+
+#pragma mark Safari 7+
+
 - (void)new__updateTitleTextFieldFrame {
     [self new__updateTitleTextFieldFrame];
     
@@ -263,6 +271,13 @@ static cosyTabs* plugin = nil;
             new = class_getInstanceMethod(class, @selector(new_setButtonWidthForTitleLayout:animated:));
             old = class_getInstanceMethod(class, @selector(setButtonWidthForTitleLayout:animated:));
             method_exchangeImplementations(new, old);
+
+            if (safari10OrLater)
+            {
+                new = class_getInstanceMethod(class, @selector(new_setTitleTextFieldCenterOffset:animated:));
+                old = class_getInstanceMethod(class, @selector(setTitleTextFieldCenterOffset:animated:));
+                method_exchangeImplementations(new, old);
+            }
         }
         else
         {
